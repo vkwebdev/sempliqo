@@ -4,7 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Line, Sphere } from "@react-three/drei";
 import * as THREE from "three";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Bot, Boxes, Calendar, Check, ChevronDown, CircleDot, Clock, Cloud, Compass, Database, FileText, Handshake, Layers, LayoutDashboard, Lightbulb, Menu, MessageSquare, Network, ShieldCheck, ShoppingBag, Smartphone, Sparkles, Target, TrendingUp, Unplug, Users, Workflow, X, Zap } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Bot, Boxes, Calendar, Check, ChevronDown, CircleDot, Clock, Cloud, Compass, Database, FileText, Handshake, Layers, LayoutDashboard, Lightbulb, Mail, Menu, MessageSquare, Network, Send, ShieldCheck, ShoppingBag, Smartphone, Sparkles, Target, TrendingUp, Unplug, Users, Workflow, X, Zap } from "lucide-react";
 import type { IconType } from "react-icons";
 import { SiAndroid, SiApple, SiCss, SiDocker, SiFlutter, SiFramer, SiGithubactions, SiGooglecloud, SiHtml5, SiJavascript, SiLaravel, SiLinux, SiMake, SiMongodb, SiMysql, SiN8N, SiNextdotjs, SiNodedotjs, SiPhp, SiPostgresql, SiPython, SiReact, SiRedis, SiShopify, SiSquarespace, SiTailwindcss, SiTypescript, SiVuedotjs, SiWebflow, SiWhatsapp, SiWix, SiWoocommerce, SiWordpress, SiZapier } from "react-icons/si";
 import { useForm } from "react-hook-form";
@@ -1346,18 +1346,36 @@ function ArticlePage() { const { slug = "software-strategy" } = useParams(), top
 const enquirySchema = z.object({ name: z.string().min(2, "Enter your name"), email: z.string().email("Enter a valid work email"), phone: z.string().optional(), company: z.string().min(2, "Enter your company"), projectType: z.string().min(1, "Select a project type"), services: z.string().min(1, "Select a service"), description: z.string().min(30, "Please provide at least 30 characters"), stage: z.string().min(1, "Select the current stage"), timeline: z.string().min(1, "Select a timeline"), budget: z.string().min(1, "Select an indicative range"), contactMethod: z.string().min(1, "Select a contact method"), consent: z.literal(true, { error: "Consent is required" }), website: z.string().max(0, "Spam detected").optional() }); type Enquiry = z.infer<typeof enquirySchema>;
 const projectTypes = ["New software product", "Existing application improvement", "Website or web application", "Mobile application", "SaaS platform", "E-commerce or CMS", "AI or AI agent", "Automation or integration", "Migration or modernization", "Maintenance or dedicated team", "Technical consultation", "Not sure yet"];
 function EnquiryForm({ compact = false }: { compact?: boolean }) {
-  const [step, setStep] = useState(1), [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle"), [errorMessage, setErrorMessage] = useState("");
+  const [step, setStep] = useState(1),
+    [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle"),
+    [isModalOpen, setIsModalOpen] = useState(false),
+    [errorMessage, setErrorMessage] = useState(""),
+    [submittedEmail, setSubmittedEmail] = useState("");
+
   const { startLoading, stopLoading } = useLoading();
-  const { register, handleSubmit, trigger, reset, formState: { errors } } = useForm<Enquiry>({ resolver: zodResolver(enquirySchema), defaultValues: { website: "" } });
-  
-  const next = async () => { if (await trigger(["projectType", "services", "description"])) setStep(2) };
-  
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    reset,
+    formState: { errors },
+  } = useForm<Enquiry>({
+    resolver: zodResolver(enquirySchema),
+    mode: "onTouched",
+    defaultValues: { website: "" },
+  });
+
+  const next = async () => {
+    const isStep1Valid = await trigger(["projectType", "services", "description"]);
+    if (isStep1Valid) setStep(2);
+  };
+
   const submit = async (data: Enquiry) => {
     setStatus("loading");
     setErrorMessage("");
     const loadId = "contact-form-submit";
-    startLoading(loadId, { scope: "global", message: "Sending project enquiry..." });
-    
+    startLoading(loadId, { scope: "global", message: "Transmitting your project brief to Sempliqo..." });
+
     try {
       const res = await fetch(contactEndpoint, {
         method: "POST",
@@ -1369,8 +1387,10 @@ function EnquiryForm({ compact = false }: { compact?: boolean }) {
         setErrorMessage(json?.message || "Something went wrong while sending your message. Please try again.");
         throw new Error();
       }
+      setSubmittedEmail(data.email);
       reset();
       setStatus("success");
+      setIsModalOpen(true);
     } catch {
       setStatus("error");
       if (!errorMessage) setErrorMessage("Something went wrong while sending your message. Please try again.");
@@ -1379,133 +1399,267 @@ function EnquiryForm({ compact = false }: { compact?: boolean }) {
     }
   };
 
-  if (status === "success")
-    return (
-      <div className="form-success-card" role="status">
-        <div className="sq-success-glow" aria-hidden="true" />
-        <div className="sq-confetti-row" aria-hidden="true">
-          <span className="sq-confetti-particle" style={{ "--c": "#19a7ff", "--d": "0.1s" } as React.CSSProperties} />
-          <span className="sq-confetti-particle" style={{ "--c": "#0878f9", "--d": "0.2s" } as React.CSSProperties} />
-          <span className="sq-confetti-particle" style={{ "--c": "#22c55e", "--d": "0.15s" } as React.CSSProperties} />
-          <span className="sq-confetti-particle" style={{ "--c": "#19a7ff", "--d": "0.25s" } as React.CSSProperties} />
-          <span className="sq-confetti-particle" style={{ "--c": "#07182e", "--d": "0.3s" } as React.CSSProperties} />
-        </div>
-
-        <div className="sq-success-icon-wrap">
-          <div className="sq-success-ring" />
-          <div className="sq-success-circle">
-            <Check size={32} strokeWidth={2.6} />
-          </div>
-          <div className="sq-badge-verified">
-            <ShieldCheck size={16} />
-          </div>
-        </div>
-
-        <h3>Project Information Received!</h3>
-        <p className="sq-success-sub">
-          Thank you for reaching out to <strong>Sempliqo</strong>. Your project brief has been delivered to our engineering lead team at <code>contact@sempliqo.tech</code>.
-        </p>
-
-        <div className="sq-success-steps">
-          <div className="sq-success-step">
-            <div className="sq-step-num">1</div>
-            <div className="sq-step-content">
-              <strong>Architecture Review</strong>
-              <span>Our technical team evaluates your stack & constraints.</span>
-            </div>
-          </div>
-          <div className="sq-success-step">
-            <div className="sq-step-num">2</div>
-            <div className="sq-step-content">
-              <strong>Scoped Discovery</strong>
-              <span>We prepare targeted questions & feasibility options.</span>
-            </div>
-          </div>
-          <div className="sq-success-step">
-            <div className="sq-step-num">3</div>
-            <div className="sq-step-content">
-              <strong>Direct Response</strong>
-              <span>You receive our consultation invitation via your chosen channel.</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="sq-success-actions">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => {
-              setStatus("idle");
-              setStep(1);
-            }}
-          >
-            Submit Another Project Brief
-          </button>
-        </div>
-      </div>
-    );
-
   return (
-    <form className={`enquiry-form ${compact ? "compact" : ""}`} onSubmit={handleSubmit(submit)} noValidate>
-      <div className="form-progress">
-        <span>Project</span>
-        <i />
-        <span>Contact</span>
-      </div>
-      <input className="honey" tabIndex={-1} autoComplete="off" {...register("website")} aria-hidden="true" />
-      {step === 1 ? (
-        <div className="form-fields">
-          <Select label="Project type" error={errors.projectType?.message} options={projectTypes} reg={register("projectType")} />
-          <Select label="Services needed" error={errors.services?.message} options={services.map((s) => s.title)} reg={register("services")} />
-          <Field area label="Brief project description" error={errors.description?.message} reg={register("description")} placeholder="What needs to change, who will use it, and what systems are involved?" />
-          <button type="button" className="btn btn-primary form-next" onClick={next}>
-            Continue <ArrowRight size={17} />
-          </button>
+    <>
+      <form className={`enquiry-form ${compact ? "compact" : ""}`} onSubmit={handleSubmit(submit)} noValidate>
+        <div className="form-progress">
+          <span className={step >= 1 ? "active-step" : ""}>01. Project Scope</span>
+          <i />
+          <span className={step >= 2 ? "active-step" : ""}>02. Contact & Schedule</span>
         </div>
-      ) : (
-        <div className="form-fields">
-          <Field label="Name" error={errors.name?.message} reg={register("name")} />
-          <Field label="Work email" type="email" error={errors.email?.message} reg={register("email")} />
-          <Field label="Phone or WhatsApp (optional)" reg={register("phone")} />
-          <Field label="Company" error={errors.company?.message} reg={register("company")} />
-          <Select label="Current project stage" error={errors.stage?.message} options={["Exploring options", "Requirements in progress", "Ready to scope", "In development", "Live and needs improvement"]} reg={register("stage")} />
-          <Select label="Desired timeline" error={errors.timeline?.message} options={["As soon as practical", "Within 3 months", "3 to 6 months", "6+ months", "Not sure"]} reg={register("timeline")} />
-          <Select label="Indicative budget range" error={errors.budget?.message} options={["To be determined", "Under $10,000", "$10,000 - $25,000", "$25,000 - $75,000", "$75,000+"]} reg={register("budget")} />
-          <Select label="Preferred contact method" error={errors.contactMethod?.message} options={["Email", "Phone", "WhatsApp", "Video call"]} reg={register("contactMethod")} />
-          <label className="file-label">
-            Optional brief or reference file
-            <input type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg" />
-          </label>
-          <label className="consent">
-            <input type="checkbox" {...register("consent")} />
-            <span>I consent to Sempliqo using this information to assess and discuss my enquiry.</span>
-          </label>
-          {errors.consent && <small className="error">{errors.consent.message}</small>}
-          <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} disabled={status === "loading"}>
-              Back
+
+        <input className="honey" tabIndex={-1} autoComplete="off" {...register("website")} aria-hidden="true" />
+
+        {step === 1 ? (
+          <div className="form-fields">
+            <Select
+              label="Project type *"
+              error={errors.projectType?.message}
+              options={projectTypes}
+              reg={register("projectType")}
+            />
+            <Select
+              label="Services needed *"
+              error={errors.services?.message}
+              options={services.map((s) => s.title)}
+              reg={register("services")}
+            />
+            <Field
+              area
+              label="Brief project description * (min 30 characters)"
+              error={errors.description?.message}
+              reg={register("description")}
+              placeholder="What needs to change, who will use it, and what systems are involved?"
+            />
+            <button type="button" className="btn btn-primary form-next" onClick={next}>
+              Continue to Contact Details <ArrowRight size={17} />
             </button>
-            <ActionButton
-              type="submit"
-              loading={status === "loading"}
-              loadingText="Submitting Enquiry..."
-              variant="primary"
-            >
-              Submit Project Enquiry
-            </ActionButton>
           </div>
-          {status === "error" && (
-            <p className="error" role="alert">
-              {errorMessage || "Something went wrong while sending your message. Please try again."}
-            </p>
-          )}
-        </div>
-      )}
-    </form>
+        ) : (
+          <div className="form-fields">
+            <Field label="Name *" error={errors.name?.message} reg={register("name")} placeholder="Your full name" />
+            <Field
+              label="Work email *"
+              type="email"
+              error={errors.email?.message}
+              reg={register("email")}
+              placeholder="you@company.com"
+            />
+            <Field
+              label="Phone or WhatsApp (optional)"
+              reg={register("phone")}
+              placeholder="+1 (555) 000-0000"
+            />
+            <Field
+              label="Company *"
+              error={errors.company?.message}
+              reg={register("company")}
+              placeholder="Company or organization"
+            />
+            <Select
+              label="Current project stage *"
+              error={errors.stage?.message}
+              options={[
+                "Exploring options",
+                "Requirements in progress",
+                "Ready to scope",
+                "In development",
+                "Live and needs improvement",
+              ]}
+              reg={register("stage")}
+            />
+            <Select
+              label="Desired timeline *"
+              error={errors.timeline?.message}
+              options={[
+                "As soon as practical",
+                "Within 3 months",
+                "3 to 6 months",
+                "6+ months",
+                "Not sure",
+              ]}
+              reg={register("timeline")}
+            />
+            <Select
+              label="Indicative budget range *"
+              error={errors.budget?.message}
+              options={[
+                "To be determined",
+                "Under $10,000",
+                "$10,000 - $25,000",
+                "$25,000 - $75,000",
+                "$75,000+",
+              ]}
+              reg={register("budget")}
+            />
+            <Select
+              label="Preferred contact method *"
+              error={errors.contactMethod?.message}
+              options={["Email", "Phone", "WhatsApp", "Video call"]}
+              reg={register("contactMethod")}
+            />
+            <label className="file-label">
+              Optional brief or reference file
+              <input type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg" />
+            </label>
+            <label className={`consent ${errors.consent ? "consent-error" : ""}`}>
+              <input type="checkbox" {...register("consent")} aria-invalid={!!errors.consent} />
+              <span>I consent to Sempliqo using this information to assess and discuss my enquiry. *</span>
+            </label>
+            {errors.consent && <small className="error">{errors.consent.message}</small>}
+
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setStep(1)}
+                disabled={status === "loading"}
+              >
+                Back
+              </button>
+              <ActionButton
+                type="submit"
+                loading={status === "loading"}
+                loadingText="Transmitting Enquiry..."
+                variant="primary"
+              >
+                Submit Project Enquiry <Send size={16} />
+              </ActionButton>
+            </div>
+
+            {status === "error" && (
+              <p className="error" role="alert">
+                {errorMessage || "Something went wrong while sending your message. Please try again."}
+              </p>
+            )}
+          </div>
+        )}
+      </form>
+
+      {/* SUCCESS MODAL POPUP WITH ANIMATED FLYING EMAIL */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div
+            className="sq-modal-backdrop"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sq-modal-title"
+            onClick={() => setIsModalOpen(false)}
+          >
+            <div className="sq-modal-card" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="sq-modal-close-btn"
+                aria-label="Close success modal"
+                onClick={() => setIsModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+
+              <div className="sq-success-glow" aria-hidden="true" />
+
+              <div className="sq-email-flight-stage">
+                <div className="sq-envelope-radar" />
+                <div className="sq-envelope-circle">
+                  <Mail size={36} strokeWidth={2.2} className="sq-envelope-paper-plane" />
+                </div>
+                <div className="sq-badge-verified">
+                  <Check size={16} strokeWidth={3} />
+                </div>
+              </div>
+
+              <div className="sq-delivery-pill">
+                <ShieldCheck size={16} />
+                <span>Email Delivered via Zoho SMTP</span>
+              </div>
+
+              <h3 id="sq-modal-title">Enquiry Successfully Dispatched!</h3>
+              <p className="sq-modal-desc">
+                Your project brief has been forwarded directly to our engineering leads at{" "}
+                <code>contact@sempliqo.tech</code>
+                {submittedEmail && (
+                  <>
+                    {" "}
+                    with replies routed to <code>{submittedEmail}</code>
+                  </>
+                )}.
+              </p>
+
+              <div className="sq-success-steps">
+                <div className="sq-success-step">
+                  <div className="sq-step-num">1</div>
+                  <div className="sq-step-content">
+                    <strong>Lead Review</strong>
+                    <span>Evaluation within 24 business hours.</span>
+                  </div>
+                </div>
+                <div className="sq-success-step">
+                  <div className="sq-step-num">2</div>
+                  <div className="sq-step-content">
+                    <strong>Architecture Scope</strong>
+                    <span>Direct engineering discovery outline.</span>
+                  </div>
+                </div>
+                <div className="sq-success-step">
+                  <div className="sq-step-num">3</div>
+                  <div className="sq-step-content">
+                    <strong>Consultation Call</strong>
+                    <span>Invite via your chosen channel.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="sq-success-actions">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setStatus("idle");
+                    setStep(1);
+                  }}
+                >
+                  Done / Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
-function Field({ label, reg, error, area, type = "text", placeholder }: any) { const id = label.toLowerCase().replace(/ /g, "-"); return <label htmlFor={id}>{label}{area ? <textarea id={id} {...reg} placeholder={placeholder} aria-invalid={!!error} /> : <input id={id} type={type} {...reg} aria-invalid={!!error} />} {error && <small className="error">{error}</small>}</label> }
-function Select({ label, reg, error, options }: any) { const id = label.toLowerCase().replace(/ /g, "-"); return <label htmlFor={id}>{label}<select id={id} {...reg} aria-invalid={!!error}><option value="">Select an option</option>{options.map((x: string) => <option key={x}>{x}</option>)}</select>{error && <small className="error">{error}</small>}</label> }
+function Field({ label, reg, error, area, type = "text", placeholder }: any) {
+  const id = label.toLowerCase().replace(/[^a-z0-9]/g, "-");
+  return (
+    <label htmlFor={id}>
+      {label}
+      {area ? (
+        <textarea id={id} {...reg} placeholder={placeholder} aria-invalid={!!error} />
+      ) : (
+        <input id={id} type={type} {...reg} placeholder={placeholder} aria-invalid={!!error} />
+      )}
+      {error && <small className="error">{error}</small>}
+    </label>
+  );
+}
+function Select({ label, reg, error, options }: any) {
+  const id = label.toLowerCase().replace(/[^a-z0-9]/g, "-");
+  return (
+    <label htmlFor={id}>
+      {label}
+      <select id={id} {...reg} aria-invalid={!!error}>
+        <option value="">Select an option</option>
+        {options.map((x: string) => (
+          <option key={x} value={x}>
+            {x}
+          </option>
+        ))}
+      </select>
+      {error && <small className="error">{error}</small>}
+    </label>
+  );
+}
 function ContactPage() { return <><Seo title="Discuss Your Software Project" description="Tell Sempliqo about your software, AI, automation, cloud, commerce, or development requirement through a structured project enquiry." /><PageHero eyebrow="Project enquiry" title="Bring the business problem. We will help structure the technical conversation." copy="Share what you know now. You do not need a complete specification to begin." cta={false} /><Breadcrumbs current="Contact" /><section className="section"><div className="container contact-layout"><div><SectionHead eyebrow="Discuss your project" title="A focused first step." copy="Your information helps identify the relevant questions, technical disciplines, and a suitable way to engage." /><div className="expect-list"><h3>What happens next</h3>{["Your context and requirements are reviewed", "Open questions and dependencies are identified", "A suitable consultation or discovery path is proposed", "No timeline or cost is committed without sufficient scope"].map(x => <p key={x}><Check />{x}</p>)}<p className="config-note">Email, phone, address, and response expectations are business-controlled fields and are not invented here.</p></div></div><EnquiryForm /></div></section></> }
 function Conversion({ compact = false }: { compact?: boolean }) {
   return (

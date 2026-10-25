@@ -1134,13 +1134,32 @@ textarea:focus-visible {
 .form-fields textarea {
     display: block;
     width: 100%;
-    border: 1px solid #b9ccdb;
-    padding: 12px;
-    margin-top: 7px
+    border: 1.5px solid #b9ccdb;
+    padding: 12px 14px;
+    margin-top: 7px;
+    border-radius: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #ffffff;
+}
+
+.form-fields input:focus,
+.form-fields select:focus,
+.form-fields textarea:focus {
+    border-color: var(--blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(8, 120, 249, 0.15);
+}
+
+.form-fields input[aria-invalid="true"],
+.form-fields select[aria-invalid="true"],
+.form-fields textarea[aria-invalid="true"] {
+    border-color: #ef4444 !important;
+    background-color: #fffafb;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
 }
 
 .form-fields textarea {
-    min-height: 120px
+    min-height: 120px;
 }
 
 .form-fields label:has(textarea),
@@ -1148,28 +1167,40 @@ textarea:focus-visible {
 .consent,
 .form-next,
 .form-actions {
-    grid-column: 1/-1
+    grid-column: 1/-1;
 }
 
 .consent {
     display: flex;
-    gap: 9px
+    gap: 9px;
+    align-items: flex-start;
 }
 
 .consent input {
     width: auto;
-    margin-top: 2px
+    margin-top: 2px;
 }
 
 .form-actions {
     display: flex;
     gap: 10px;
-    justify-content: flex-end
+    justify-content: flex-end;
 }
 
 .error {
-    color: #b3222e;
-    font-size: 11px
+    display: block;
+    color: #dc2626;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-top: 5px;
+    letter-spacing: -0.01em;
+    animation: sq-error-shake 0.3s ease-in-out;
+}
+
+@keyframes sq-error-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
 }
 
 .honey {
