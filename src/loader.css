@@ -1,0 +1,233 @@
+/* ==========================================================================
+   SEMPLIQO PREMIUM WEBSITE-WIDE LOADING SYSTEM
+   Brand colors: Deep Navy (#07182e), Blue (#0878f9), Electric (#19a7ff)
+   ========================================================================== */
+
+/* 1. TOP PROGRESS BAR (Subtle, responsive, premium route & network feedback) */
+.sq-top-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(8, 120, 249, 0.15);
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sq-top-progress-glow {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #0969e8, var(--electric), #ffffff, var(--electric), #0969e8);
+  background-size: 200% 100%;
+  animation: sq-top-stream 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px #19a7ff, 0 0 4px #0878f9;
+}
+
+@keyframes sq-top-stream {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 2. SPINNER STYLES */
+.sempliqo-spinner {
+  display: inline-block;
+  animation: sq-spin 0.85s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.sempliqo-spinner-arc {
+  stroke-dasharray: 45;
+  stroke-dashoffset: 15;
+}
+
+@keyframes sq-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 3. BUTTON LOADING STATE */
+.btn.is-loading {
+  position: relative;
+  cursor: not-allowed;
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.btn.is-loading .sempliqo-spinner {
+  margin-right: 4px;
+}
+
+/* 4. INLINE LOADER */
+.sq-inline-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sq-inline-compact {
+  padding: 4px 8px;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.sq-inline-text {
+  color: var(--muted);
+  letter-spacing: -0.01em;
+}
+
+/* 5. FULL PAGE LOADER (App initialization / block) */
+.sq-full-page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, #0d274c, #07182e 70%, #040e1d);
+  color: #ffffff;
+  animation: sq-fade-in 0.25s ease-out forwards;
+}
+
+.sq-loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 40px;
+}
+
+.sq-brand-pulse-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.sempliqo-loader-brand-svg {
+  filter: drop-shadow(0 0 16px rgba(25, 167, 255, 0.45));
+  animation: sq-pulse-scale 2s infinite ease-in-out;
+}
+
+.sq-radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(25, 167, 255, 0.35);
+  animation: sq-radar-wave 2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+.sq-loader-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #c5dcf0;
+  letter-spacing: 0.02em;
+  margin: 0;
+  animation: sq-pulse-opacity 1.8s infinite ease-in-out;
+}
+
+@keyframes sq-radar-wave {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes sq-pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sq-pulse-opacity {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sq-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 6. OVERLAY LOADER */
+.sq-overlay-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 24, 46, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99980;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sq-fade-in 0.2s ease-out forwards;
+}
+
+.sq-overlay-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 7. REDUCED MOTION PREFERENCE */
+@media (prefers-reduced-motion: reduce) {
+  .sq-top-progress-glow,
+  .sempliqo-spinner,
+  .sempliqo-loader-brand-svg,
+  .sq-radar-ring,
+  .sq-loader-text {
+    animation: none !important;
+  }
+
+  .sq-top-progress-bar {
+    background: var(--blue);
+  }
+
+  .sempliqo-spinner {
+    opacity: 0.7;
+  }
+}

@@ -15,10 +15,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { services, solutions, technologies } from "./data";
 import "./home-beauty.css";
+import "./loader.css";
+import { LoadingProvider, useLoading } from "./context/LoadingContext";
+import { TopProgressBar, OverlayLoader, ActionButton } from "./components/loader/LoadingComponents";
 
 const fullLogo = "/sempliqo_combined_logo%20(1)(1).png";
 const symbolLogo = "/extract_only_the_geometric_s_symbol_from_the_left_side_of_this_image._remove(1).png";
-const contactEndpoint = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_CONTACT_ENDPOINT;
+const contactEndpoint = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_CONTACT_ENDPOINT || "/api/contact";
 
 const techBrands: Record<string, { icon?: IconType; color: string; soft: string }> = {
   PHP: { icon: SiPhp, color: "#777BB4", soft: "#f0f1fa" }, Laravel: { icon: SiLaravel, color: "#FF2D20", soft: "#fff0ef" }, "Node.js": { icon: SiNodedotjs, color: "#339933", soft: "#edf8ed" }, Python: { icon: SiPython, color: "#3776AB", soft: "#edf4fa" }, JavaScript: { icon: SiJavascript, color: "#b79e00", soft: "#fff9d9" }, TypeScript: { icon: SiTypescript, color: "#3178C6", soft: "#ebf4fc" }, React: { icon: SiReact, color: "#087EA4", soft: "#e8f8fc" }, "Next.js": { icon: SiNextdotjs, color: "#111111", soft: "#f1f1f1" }, "Vue.js": { icon: SiVuedotjs, color: "#42B883", soft: "#eaf9f2" }, HTML: { icon: SiHtml5, color: "#E34F26", soft: "#fff0eb" }, CSS: { icon: SiCss, color: "#663399", soft: "#f4ecfa" }, "Tailwind CSS": { icon: SiTailwindcss, color: "#06B6D4", soft: "#e8fbfe" }, Flutter: { icon: SiFlutter, color: "#02569B", soft: "#eaf3fa" }, "React Native": { icon: SiReact, color: "#087EA4", soft: "#e8f8fc" }, Android: { icon: SiAndroid, color: "#3DDC84", soft: "#eafff3" }, iOS: { icon: SiApple, color: "#111111", soft: "#f1f1f1" }, WordPress: { icon: SiWordpress, color: "#21759B", soft: "#ebf5f9" }, WooCommerce: { icon: SiWoocommerce, color: "#96588A", soft: "#f8eff6" }, Shopify: { icon: SiShopify, color: "#7AB55C", soft: "#f1f8ed" }, Webflow: { icon: SiWebflow, color: "#146EF5", soft: "#eaf2ff" }, Wix: { icon: SiWix, color: "#111111", soft: "#f1f1f1" }, Squarespace: { icon: SiSquarespace, color: "#111111", soft: "#f1f1f1" }, Framer: { icon: SiFramer, color: "#0055FF", soft: "#eaf0ff" }, MySQL: { icon: SiMysql, color: "#4479A1", soft: "#edf4f8" }, PostgreSQL: { icon: SiPostgresql, color: "#4169E1", soft: "#edf0fe" }, MongoDB: { icon: SiMongodb, color: "#47A248", soft: "#edf8ed" }, Redis: { icon: SiRedis, color: "#DC382D", soft: "#fff0ef" }, "Google Cloud": { icon: SiGooglecloud, color: "#4285F4", soft: "#edf4ff" }, Docker: { icon: SiDocker, color: "#2496ED", soft: "#eaf6fe" }, Linux: { icon: SiLinux, color: "#D9A400", soft: "#fff9df" }, "GitHub Actions": { icon: SiGithubactions, color: "#2088FF", soft: "#ebf5ff" }, n8n: { icon: SiN8N, color: "#EA4B71", soft: "#fff0f4" }, Make: { icon: SiMake, color: "#6D00CC", soft: "#f5ebff" }, Zapier: { icon: SiZapier, color: "#FF4F00", soft: "#fff1eb" }, "WhatsApp Business API": { icon: SiWhatsapp, color: "#25D366", soft: "#eafff2" }, AWS: { color: "#FF9900", soft: "#fff6e7" }, Azure: { color: "#0078D4", soft: "#eaf5fc" }, OpenAI: { color: "#10A37F", soft: "#e9f8f4" }, LLMs: { color: "#7C3AED", soft: "#f3edff" }, RAG: { color: "#0EA5E9", soft: "#eaf8fe" }, "AI Agents": { color: "#EC4899", soft: "#fff0f7" }, "Voice AI": { color: "#F97316", soft: "#fff2e9" }, "CRM Integrations": { color: "#0F766E", soft: "#eaf7f6" }, "CI/CD": { color: "#2563EB", soft: "#edf3ff" }, "Magento / Adobe Commerce": { color: "#F26322", soft: "#fff1ea" }
@@ -64,7 +67,82 @@ function Header() {
 function MegaMenu({ title, items }: { title: string; items: string[][] }) { return <div className="mega"><div className="mega-head"><span>{title}</span><Link to={title.startsWith("Engineering") ? "/services" : "/technologies"}>View overview <ArrowRight size={15} /></Link></div><div className="mega-grid">{items.map(([label, path, copy]) => <Link key={label} to={path}><strong>{label}</strong><small>{copy}</small></Link>)}</div></div>; }
 function Footer() { return <footer><div className="container footer-grid"><div className="footer-brand"><BrandLogo light /><p>Software, AI, automation, and cloud engineering aligned with the way your business needs to operate.</p><Link to="/contact" className="text-link">Discuss Your Project <ArrowRight size={16} /></Link></div><div><h3>Services</h3>{services.slice(0, 5).map(s => <Link key={s.slug} to={`/services/${s.slug}`}>{s.title}</Link>)}</div><div><h3>Explore</h3><Link to="/technologies">Technologies</Link><Link to="/solutions">Solutions</Link><Link to="/about">About</Link><Link to="/insights">Insights</Link><Link to="/contact">Contact</Link></div><div><h3>Contact</h3><p className="muted">Business-controlled email, phone, address, and social URLs can be configured before deployment.</p><Link to="/contact">Project enquiry</Link></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Sempliqo</span><div><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/cookies">Cookies</Link></div></div></footer> }
 
-function Layout() { const location = useLocation(), reduced = useReducedMotion(); useEffect(() => { const lenis = new Lenis({ autoRaf: true, duration: reduced ? 0 : 1 }); return () => lenis.destroy() }, [reduced]); useEffect(() => { if (reduced) return; gsap.registerPlugin(ScrollTrigger); const ctx = gsap.context(() => gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach(el => gsap.fromTo(el, { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: .7, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 88%", once: true } }))); return () => ctx.revert() }, [location.pathname, reduced]); return <><Header /><AnimatePresence mode="wait"><motion.main id="main" key={location.pathname} initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }}><Routes><Route path="/" element={<Home />} /><Route path="/services" element={<ServicesPage />} /><Route path="/services/:slug" element={<ServicePage />} /><Route path="/technologies" element={<TechnologiesPage />} /><Route path="/solutions" element={<SolutionsPage />} /><Route path="/about" element={<AboutPage />} /><Route path="/insights" element={<InsightsPage />} /><Route path="/insights/:slug" element={<ArticlePage />} /><Route path="/contact" element={<ContactPage />} /><Route path="/:policy" element={<PolicyPage />} /><Route path="*" element={<NotFound />} /></Routes></motion.main></AnimatePresence><Footer /></> }
+function Layout() {
+  const location = useLocation(), reduced = useReducedMotion();
+  const { startLoading, stopLoading } = useLoading();
+
+  // Route transition progress indicator
+  useEffect(() => {
+    const routeId = `route-nav-${location.pathname}`;
+    startLoading(routeId, { scope: "global" });
+    const timer = setTimeout(() => {
+      stopLoading(routeId);
+    }, 280);
+    return () => {
+      clearTimeout(timer);
+      stopLoading(routeId);
+    };
+  }, [location.pathname, startLoading, stopLoading]);
+
+  useEffect(() => {
+    const lenis = new Lenis({ autoRaf: true, duration: reduced ? 0 : 1 });
+    return () => lenis.destroy();
+  }, [reduced]);
+
+  useEffect(() => {
+    if (reduced) return;
+    gsap.registerPlugin(ScrollTrigger);
+    const ctx = gsap.context(() =>
+      gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
+        gsap.fromTo(
+          el,
+          { y: 22, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power2.out",
+            scrollTrigger: { trigger: el, start: "top 88%", once: true },
+          }
+        )
+      )
+    );
+    return () => ctx.revert();
+  }, [location.pathname, reduced]);
+
+  return (
+    <>
+      <TopProgressBar />
+      <OverlayLoader />
+      <Header />
+      <AnimatePresence mode="wait">
+        <motion.main
+          id="main"
+          key={location.pathname}
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:slug" element={<ServicePage />} />
+            <Route path="/technologies" element={<TechnologiesPage />} />
+            <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
+            <Route path="/insights/:slug" element={<ArticlePage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/:policy" element={<PolicyPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.main>
+      </AnimatePresence>
+      <Footer />
+    </>
+  );
+}
 function SectionHead({ eyebrow, title, copy, light = false }: { eyebrow: string; title: string; copy?: string; light?: boolean }) { return <div className={`section-head ${light ? "light" : ""}`} data-reveal><span>{eyebrow}</span><h2>{title}</h2>{copy && <p>{copy}</p>}</div> }
 function CtaRow({ secondary = "Explore Our Capabilities" }: { secondary?: string }) { return <div className="cta-row"><Link to="/contact" className="btn btn-primary">Discuss Your Project <ArrowRight size={18} /></Link><Link to="/services" className="btn btn-secondary">{secondary}</Link></div> }
 
@@ -1267,7 +1345,108 @@ function ArticlePage() { const { slug = "software-strategy" } = useParams(), top
 
 const enquirySchema = z.object({ name: z.string().min(2, "Enter your name"), email: z.string().email("Enter a valid work email"), phone: z.string().optional(), company: z.string().min(2, "Enter your company"), projectType: z.string().min(1, "Select a project type"), services: z.string().min(1, "Select a service"), description: z.string().min(30, "Please provide at least 30 characters"), stage: z.string().min(1, "Select the current stage"), timeline: z.string().min(1, "Select a timeline"), budget: z.string().min(1, "Select an indicative range"), contactMethod: z.string().min(1, "Select a contact method"), consent: z.literal(true, { error: "Consent is required" }), website: z.string().max(0, "Spam detected").optional() }); type Enquiry = z.infer<typeof enquirySchema>;
 const projectTypes = ["New software product", "Existing application improvement", "Website or web application", "Mobile application", "SaaS platform", "E-commerce or CMS", "AI or AI agent", "Automation or integration", "Migration or modernization", "Maintenance or dedicated team", "Technical consultation", "Not sure yet"];
-function EnquiryForm({ compact = false }: { compact?: boolean }) { const [step, setStep] = useState(1), [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle"); const { register, handleSubmit, trigger, formState: { errors } } = useForm<Enquiry>({ resolver: zodResolver(enquirySchema), defaultValues: { website: "" } }); const next = async () => { if (await trigger(["projectType", "services", "description"])) setStep(2) }; const submit = async (data: Enquiry) => { setStatus("loading"); try { if (contactEndpoint) { const res = await fetch(contactEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }); if (!res.ok) throw new Error() } else await new Promise(r => setTimeout(r, 700)); setStatus("success") } catch { setStatus("error") } }; if (status === "success") return <div className="form-success" role="status"><Check /><h3>Your project information is ready for review.</h3><p>The configured Sempliqo contact workflow will use your preferred method to continue the technical conversation. No response time is promised until configured.</p></div>; return <form className={`enquiry-form ${compact ? "compact" : ""}`} onSubmit={handleSubmit(submit)} noValidate><div className="form-progress"><span>Project</span><i /><span>Contact</span></div><input className="honey" tabIndex={-1} autoComplete="off" {...register("website")} aria-hidden="true" />{step === 1 ? <div className="form-fields"><Select label="Project type" error={errors.projectType?.message} options={projectTypes} reg={register("projectType")} /><Select label="Services needed" error={errors.services?.message} options={services.map(s => s.title)} reg={register("services")} /><Field area label="Brief project description" error={errors.description?.message} reg={register("description")} placeholder="What needs to change, who will use it, and what systems are involved?" /><button type="button" className="btn btn-primary form-next" onClick={next}>Continue <ArrowRight size={17} /></button></div> : <div className="form-fields"><Field label="Name" error={errors.name?.message} reg={register("name")} /><Field label="Work email" type="email" error={errors.email?.message} reg={register("email")} /><Field label="Phone or WhatsApp (optional)" reg={register("phone")} /><Field label="Company" error={errors.company?.message} reg={register("company")} /><Select label="Current project stage" error={errors.stage?.message} options={["Exploring options", "Requirements in progress", "Ready to scope", "In development", "Live and needs improvement"]} reg={register("stage")} /><Select label="Desired timeline" error={errors.timeline?.message} options={["As soon as practical", "Within 3 months", "3 to 6 months", "6+ months", "Not sure"]} reg={register("timeline")} /><Select label="Indicative budget range" error={errors.budget?.message} options={["To be determined", "Under $10,000", "$10,000 - $25,000", "$25,000 - $75,000", "$75,000+"]} reg={register("budget")} /><Select label="Preferred contact method" error={errors.contactMethod?.message} options={["Email", "Phone", "WhatsApp", "Video call"]} reg={register("contactMethod")} /><label className="file-label">Optional brief or reference file<input type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg" /></label><label className="consent"><input type="checkbox" {...register("consent")} /><span>I consent to Sempliqo using this information to assess and discuss my enquiry.</span></label>{errors.consent && <small className="error">{errors.consent.message}</small>}<div className="form-actions"><button type="button" className="btn btn-secondary" onClick={() => setStep(1)}>Back</button><button disabled={status === "loading"} className="btn btn-primary">{status === "loading" ? "Submitting..." : "Submit Project Enquiry"}</button></div>{status === "error" && <p className="error" role="alert">Submission failed. Please check your connection and try again.</p>}</div>}</form> }
+function EnquiryForm({ compact = false }: { compact?: boolean }) {
+  const [step, setStep] = useState(1), [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle"), [errorMessage, setErrorMessage] = useState("");
+  const { startLoading, stopLoading } = useLoading();
+  const { register, handleSubmit, trigger, reset, formState: { errors } } = useForm<Enquiry>({ resolver: zodResolver(enquirySchema), defaultValues: { website: "" } });
+  
+  const next = async () => { if (await trigger(["projectType", "services", "description"])) setStep(2) };
+  
+  const submit = async (data: Enquiry) => {
+    setStatus("loading");
+    setErrorMessage("");
+    const loadId = "contact-form-submit";
+    startLoading(loadId, { scope: "global", message: "Sending project enquiry..." });
+    
+    try {
+      const res = await fetch(contactEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        setErrorMessage(json?.message || "Something went wrong while sending your message. Please try again.");
+        throw new Error();
+      }
+      reset();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+      if (!errorMessage) setErrorMessage("Something went wrong while sending your message. Please try again.");
+    } finally {
+      stopLoading(loadId);
+    }
+  };
+
+  if (status === "success")
+    return (
+      <div className="form-success" role="status">
+        <Check />
+        <h3>Thanks for contacting Sempliqo. We'll get back to you shortly.</h3>
+        <p>The configured Sempliqo contact workflow will use your preferred method to continue the technical conversation.</p>
+      </div>
+    );
+
+  return (
+    <form className={`enquiry-form ${compact ? "compact" : ""}`} onSubmit={handleSubmit(submit)} noValidate>
+      <div className="form-progress">
+        <span>Project</span>
+        <i />
+        <span>Contact</span>
+      </div>
+      <input className="honey" tabIndex={-1} autoComplete="off" {...register("website")} aria-hidden="true" />
+      {step === 1 ? (
+        <div className="form-fields">
+          <Select label="Project type" error={errors.projectType?.message} options={projectTypes} reg={register("projectType")} />
+          <Select label="Services needed" error={errors.services?.message} options={services.map((s) => s.title)} reg={register("services")} />
+          <Field area label="Brief project description" error={errors.description?.message} reg={register("description")} placeholder="What needs to change, who will use it, and what systems are involved?" />
+          <button type="button" className="btn btn-primary form-next" onClick={next}>
+            Continue <ArrowRight size={17} />
+          </button>
+        </div>
+      ) : (
+        <div className="form-fields">
+          <Field label="Name" error={errors.name?.message} reg={register("name")} />
+          <Field label="Work email" type="email" error={errors.email?.message} reg={register("email")} />
+          <Field label="Phone or WhatsApp (optional)" reg={register("phone")} />
+          <Field label="Company" error={errors.company?.message} reg={register("company")} />
+          <Select label="Current project stage" error={errors.stage?.message} options={["Exploring options", "Requirements in progress", "Ready to scope", "In development", "Live and needs improvement"]} reg={register("stage")} />
+          <Select label="Desired timeline" error={errors.timeline?.message} options={["As soon as practical", "Within 3 months", "3 to 6 months", "6+ months", "Not sure"]} reg={register("timeline")} />
+          <Select label="Indicative budget range" error={errors.budget?.message} options={["To be determined", "Under $10,000", "$10,000 - $25,000", "$25,000 - $75,000", "$75,000+"]} reg={register("budget")} />
+          <Select label="Preferred contact method" error={errors.contactMethod?.message} options={["Email", "Phone", "WhatsApp", "Video call"]} reg={register("contactMethod")} />
+          <label className="file-label">
+            Optional brief or reference file
+            <input type="file" accept=".pdf,.doc,.docx,.txt,.png,.jpg" />
+          </label>
+          <label className="consent">
+            <input type="checkbox" {...register("consent")} />
+            <span>I consent to Sempliqo using this information to assess and discuss my enquiry.</span>
+          </label>
+          {errors.consent && <small className="error">{errors.consent.message}</small>}
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} disabled={status === "loading"}>
+              Back
+            </button>
+            <ActionButton
+              type="submit"
+              loading={status === "loading"}
+              loadingText="Submitting Enquiry..."
+              variant="primary"
+            >
+              Submit Project Enquiry
+            </ActionButton>
+          </div>
+          {status === "error" && (
+            <p className="error" role="alert">
+              {errorMessage || "Something went wrong while sending your message. Please try again."}
+            </p>
+          )}
+        </div>
+      )}
+    </form>
+  );
+}
 function Field({ label, reg, error, area, type = "text", placeholder }: any) { const id = label.toLowerCase().replace(/ /g, "-"); return <label htmlFor={id}>{label}{area ? <textarea id={id} {...reg} placeholder={placeholder} aria-invalid={!!error} /> : <input id={id} type={type} {...reg} aria-invalid={!!error} />} {error && <small className="error">{error}</small>}</label> }
 function Select({ label, reg, error, options }: any) { const id = label.toLowerCase().replace(/ /g, "-"); return <label htmlFor={id}>{label}<select id={id} {...reg} aria-invalid={!!error}><option value="">Select an option</option>{options.map((x: string) => <option key={x}>{x}</option>)}</select>{error && <small className="error">{error}</small>}</label> }
 function ContactPage() { return <><Seo title="Discuss Your Software Project" description="Tell Sempliqo about your software, AI, automation, cloud, commerce, or development requirement through a structured project enquiry." /><PageHero eyebrow="Project enquiry" title="Bring the business problem. We will help structure the technical conversation." copy="Share what you know now. You do not need a complete specification to begin." cta={false} /><Breadcrumbs current="Contact" /><section className="section"><div className="container contact-layout"><div><SectionHead eyebrow="Discuss your project" title="A focused first step." copy="Your information helps identify the relevant questions, technical disciplines, and a suitable way to engage." /><div className="expect-list"><h3>What happens next</h3>{["Your context and requirements are reviewed", "Open questions and dependencies are identified", "A suitable consultation or discovery path is proposed", "No timeline or cost is committed without sufficient scope"].map(x => <p key={x}><Check />{x}</p>)}<p className="config-note">Email, phone, address, and response expectations are business-controlled fields and are not invented here.</p></div></div><EnquiryForm /></div></section></> }
@@ -1316,4 +1495,4 @@ function Conversion({ compact = false }: { compact?: boolean }) {
 }
 function PolicyPage() { const { policy } = useParams(), valid: Record<string, string> = { privacy: "Privacy Policy", terms: "Terms of Use", cookies: "Cookie Policy" }, title = valid[policy || ""]; if (!title) return <NotFound />; return <><Seo title={title} description={`${title} template for Sempliqo.`} /><PageHero eyebrow="Legal" title={title} copy="A transparent, configurable legal template to be reviewed and completed for Sempliqo's operating jurisdictions before publication." cta={false} /><article className="article container"><h2>Business details and scope</h2><p>Insert the applicable legal entity, registered address, contact information, governing jurisdiction, and effective date following professional legal review.</p><h2>Information and services</h2><p>Describe the data, cookies, services, responsibilities, retention practices, subprocessors, and user rights that apply to the deployed website and enquiry workflow.</p><h2>Contact and updates</h2><p>Provide the configured privacy or legal contact and explain how material updates will be communicated. This template is not legal advice.</p></article></> }
 function NotFound() { return <section className="not-found"><Seo title="Page Not Found" description="The requested Sempliqo page could not be found." /><h1>That page is not available.</h1><p>Use the service overview or begin a project conversation.</p><CtaRow /></section> }
-export default function App() { return <BrowserRouter><Layout /></BrowserRouter> }
+export default function App() { return <BrowserRouter><LoadingProvider><Layout /></LoadingProvider></BrowserRouter> }
