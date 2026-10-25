@@ -1381,10 +1381,67 @@ function EnquiryForm({ compact = false }: { compact?: boolean }) {
 
   if (status === "success")
     return (
-      <div className="form-success" role="status">
-        <Check />
-        <h3>Thanks for contacting Sempliqo. We'll get back to you shortly.</h3>
-        <p>The configured Sempliqo contact workflow will use your preferred method to continue the technical conversation.</p>
+      <div className="form-success-card" role="status">
+        <div className="sq-success-glow" aria-hidden="true" />
+        <div className="sq-confetti-row" aria-hidden="true">
+          <span className="sq-confetti-particle" style={{ "--c": "#19a7ff", "--d": "0.1s" } as React.CSSProperties} />
+          <span className="sq-confetti-particle" style={{ "--c": "#0878f9", "--d": "0.2s" } as React.CSSProperties} />
+          <span className="sq-confetti-particle" style={{ "--c": "#22c55e", "--d": "0.15s" } as React.CSSProperties} />
+          <span className="sq-confetti-particle" style={{ "--c": "#19a7ff", "--d": "0.25s" } as React.CSSProperties} />
+          <span className="sq-confetti-particle" style={{ "--c": "#07182e", "--d": "0.3s" } as React.CSSProperties} />
+        </div>
+
+        <div className="sq-success-icon-wrap">
+          <div className="sq-success-ring" />
+          <div className="sq-success-circle">
+            <Check size={32} strokeWidth={2.6} />
+          </div>
+          <div className="sq-badge-verified">
+            <ShieldCheck size={16} />
+          </div>
+        </div>
+
+        <h3>Project Information Received!</h3>
+        <p className="sq-success-sub">
+          Thank you for reaching out to <strong>Sempliqo</strong>. Your project brief has been delivered to our engineering lead team at <code>contact@sempliqo.tech</code>.
+        </p>
+
+        <div className="sq-success-steps">
+          <div className="sq-success-step">
+            <div className="sq-step-num">1</div>
+            <div className="sq-step-content">
+              <strong>Architecture Review</strong>
+              <span>Our technical team evaluates your stack & constraints.</span>
+            </div>
+          </div>
+          <div className="sq-success-step">
+            <div className="sq-step-num">2</div>
+            <div className="sq-step-content">
+              <strong>Scoped Discovery</strong>
+              <span>We prepare targeted questions & feasibility options.</span>
+            </div>
+          </div>
+          <div className="sq-success-step">
+            <div className="sq-step-num">3</div>
+            <div className="sq-step-content">
+              <strong>Direct Response</strong>
+              <span>You receive our consultation invitation via your chosen channel.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="sq-success-actions">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => {
+              setStatus("idle");
+              setStep(1);
+            }}
+          >
+            Submit Another Project Brief
+          </button>
+        </div>
       </div>
     );
 
