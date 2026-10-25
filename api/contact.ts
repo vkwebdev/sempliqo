@@ -127,6 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const secure = process.env.SMTP_SECURE === "true" || port === 465;
   const user = process.env.SMTP_USER || "contact@sempliqo.tech";
   const pass = process.env.SMTP_PASSWORD;
+  const ccRecipient = process.env.SMTP_CC !== undefined ? process.env.SMTP_CC : "vkwebdevloper@gmail.com";
 
   if (!pass) {
     console.error("Server misconfiguration: SMTP_PASSWORD environment variable is missing.");
@@ -238,6 +239,7 @@ Consent: Granted
     await transporter.sendMail({
       from: `"Sempliqo Website" <${user}>`,
       to: user,
+      ...(ccRecipient ? { cc: ccRecipient } : {}),
       replyTo: email,
       subject: "New Contact Form Submission — Sempliqo",
       text: textContent,
